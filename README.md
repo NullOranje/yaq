@@ -1,5 +1,7 @@
 # Yaq
 
+![Elixir CI](https://github.com/NullOranje/yaq/workflows/Elixir%20CI/badge.svg)
+
 Yet Another Queue module for Elixir
 
 ## About
