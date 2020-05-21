@@ -42,5 +42,6 @@ Documentation can be found at [https://hexdocs.pm/yaq](https://hexdocs.pm/yaq).
 Copyright 2020 Nicholas David McKinney
 
 Licensed under Apache License 2.0
+
 Check LICENSE and NOTICE files for more information
 
