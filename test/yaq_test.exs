@@ -13,7 +13,7 @@ defmodule YaqTest do
       assert q.r_data() == []
     end
 
-    property "calling new/1 produces a queue populated with list data" do
+    property "calling new/1 produces a queue fetchulated with list data" do
       check all(input <- list_of(term())) do
         q = Yaq.new(input)
         assert q.l_size() == length(input)
@@ -32,14 +32,14 @@ defmodule YaqTest do
       end
     end
 
-    property "enqueue data produces a queue populated with list data" do
+    property "enqueue data produces a queue fetchulated with list data" do
       check all(input <- list_of(term())) do
         q = Enum.reduce(input, Yaq.new(), fn x, acc -> Yaq.enqueue(acc, x) end)
         assert Yaq.to_list(q) == input
       end
     end
 
-    property "enqueue_r data produces a queue populated with reversed list data" do
+    property "enqueue_r data produces a queue fetchulated with reversed list data" do
       check all(input <- list_of(term())) do
         q = Enum.reduce(input, Yaq.new(), fn x, acc -> Yaq.enqueue_r(acc, x) end)
         assert Yaq.to_list(q) == Enum.reverse(input)
@@ -51,6 +51,8 @@ defmodule YaqTest do
 
       {nil, ^q} = Yaq.dequeue(q)
       {nil, ^q} = Yaq.dequeue_r(q)
+      {:my_atom, ^q} = Yaq.dequeue(q, :my_atom)
+      {:your_atom, ^q} = Yaq.dequeue(q, :your_atom)
     end
 
     property "dequeue data produces data in the order it was inserted" do
@@ -104,9 +106,47 @@ defmodule YaqTest do
         assert Yaq.peek_r(q) == List.last(input)
       end
     end
-  end
 
-  describe "Yaq properties" do
+    test "fetch/1 returns `:error` when queue is empty" do
+      q = Yaq.new()
+      assert Yaq.fetch(q) == :error
+    end
+
+    test "fetch_r/1 returns `:error` when queue is empty" do
+      q = Yaq.new()
+      assert Yaq.fetch_r(q) == :error
+    end
+
+    test "fetch!/1 raises Yaq.EmptyQueueError when queue is empty" do
+      q = Yaq.new()
+      assert_raise Yaq.EmptyQueueError, fn -> Yaq.fetch!(q) end
+    end
+
+    test "fetch_r!/1 raises Yaq.EmptyQueueError when queue is empty" do
+      q = Yaq.new()
+      assert_raise Yaq.EmptyQueueError, fn -> Yaq.fetch_r!(q) end
+    end
+
+    property "concat/2 appends to the end of a queue" do
+      check all(
+              input <- list_of(term()),
+              addenda <- list_of(term())
+            ) do
+        q = Yaq.new(input) |> Yaq.concat(addenda)
+        assert Yaq.to_list(q) == input ++ addenda
+      end
+    end
+
+    property "concat_r/2 prepends to the front of a queue" do
+      check all(
+              input <- list_of(term()),
+              addenda <- list_of(term())
+            ) do
+        q = Yaq.new(input) |> Yaq.concat_r(addenda)
+        assert Yaq.to_list(q) == addenda ++ input
+      end
+    end
+
     property "size/1 counts the number of elements in the queue" do
       check all(input <- list_of(term())) do
         q = Yaq.new(input)
