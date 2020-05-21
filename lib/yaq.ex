@@ -291,7 +291,7 @@ defmodule Yaq do
   @doc """
   Fetches the front value from the queue.
 
-  If the queue is empty, reutrns the tuple `{:error, new_queue}`.  Otherwise, returns the tuple `{{:ok, value}, q}`.
+  If the queue is empty, reutrns the `:error`.  Otherwise, returns the tuple `{value, updated_q}`.
 
   ## Parameters
 
@@ -299,12 +299,12 @@ defmodule Yaq do
 
   ## Examples
 
-      iex> = Yaq.new() |> Yaq.fetch()
+      iex> Yaq.new() |> Yaq.fetch()
       :error
 
       iex> {response, queue} = Yaq.new([1, 2, 3]) |> Yaq.fetch()
       iex> response
-      {:ok, 1}
+      1
       iex> queue
       #Yaq<length: 2>
 
@@ -342,7 +342,7 @@ defmodule Yaq do
   @doc """
   Fetches the rear value from the queue.
 
-  If the queue is empty, reutrns the tuple `{:error, new_queue}`.  Otherwise, returns the tuple `{{:ok, value}, q}`.
+  If the queue is empty, reutrns the `:error`.  Otherwise, returns the tuple `{{:ok, value}, q}`.
 
   ## Parameters
 
@@ -350,27 +350,20 @@ defmodule Yaq do
 
   ## Examples
 
-      iex> {response, queue} = Yaq.new() |> Yaq.fetch_r()
-      iex> response
+      iex> Yaq.new() |> Yaq.fetch_r()
       :error
-      iex> queue
-      #Yaq<length: 0>
 
       iex> {response, queue} = Yaq.new([1, 2, 3]) |> Yaq.fetch_r()
       iex> response
-      {:ok, 3}
+      3
       iex> queue
       #Yaq<length: 2>
 
   """
-  @spec fetch_r(t()) :: {{:ok, value()}, t()} | {:error, t()}
-  def fetch_r(%__MODULE__{l_size: 0, r_size: 0} = q), do: {:error, q}
+  @spec fetch_r(t()) :: {{:ok, value()}, t()} | :error
+  def fetch_r(%__MODULE__{l_size: 0, r_size: 0}), do: :error
 
-  def fetch_r(%__MODULE__{} = q) do
-    {value, q} = dequeue_r(q)
-
-    {{:ok, value}, q}
-  end
+  def fetch_r(%__MODULE__{} = q), do: dequeue_r(q)
 
   @doc """
   Fetches the rear value from the queue.
