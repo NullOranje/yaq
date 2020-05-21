@@ -38,6 +38,7 @@ defmodule Yaq.MixProject do
 
   defp package() do
     [
+      description: "Double-ended queue rewritten for Elixir",
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/NullOranje/yaq"}
     ]
