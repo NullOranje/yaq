@@ -33,7 +33,7 @@ The package can be installed by adding `yaq` to your list of dependencies in `mi
 ```elixir
 def deps do
   [
-    {:yaq, "~> 1.0.0"}
+    {:yaq, "~> 1.1"}
   ]
 end
 ```
