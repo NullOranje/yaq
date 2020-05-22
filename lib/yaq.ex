@@ -408,6 +408,87 @@ defmodule Yaq do
   end
 
   @doc """
+  Splits the queue in two.  Takes up to the first `n` elements from the front of
+  the  queue as the first queue and returns the remainder as the second.  
+
+  If `n` is larger than the size of `q`, then the first queue will be `q` and the 
+  second will be empty.
+
+  ## Parameters
+
+    - `q`: Current queue
+    - `n`: Max size of the first queue
+
+  ## Examples
+      
+      iex> {left, right} = Yaq.new(1..10) |> Yaq.split(0)
+      iex> Yaq.to_list(left)
+      []
+      iex> Yaq.to_list(right)
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      
+      iex> {left, right} = Yaq.new(1..10) |> Yaq.split(10)
+      iex> Yaq.to_list(left)
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      iex> Yaq.to_list(right)
+      []
+
+      iex> {left, right} = Yaq.new(1..10) |> Yaq.split(20)
+      iex> Yaq.to_list(left)
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      iex> Yaq.to_list(right)
+      []
+
+      iex> {left, right} = Yaq.new(1..10) |> Yaq.split(3)
+      iex> Yaq.to_list(left)
+      [1, 2, 3]
+      iex> Yaq.to_list(right)
+      [4, 5, 6, 7, 8, 9, 10]
+        
+      iex> {left, right} = Yaq.new(1..10) |> Yaq.split(8)
+      iex> Yaq.to_list(left)
+      [1, 2, 3, 4, 5, 6, 7, 8]
+      iex> Yaq.to_list(right)
+      [9, 10]
+
+  """
+  @spec split(t(), non_neg_integer()) :: {t(), t()}
+  def split(%__MODULE__{} = q, 0), do: {Yaq.new(), q}
+  def split(%__MODULE__{l_size: l, r_size: r} = q, n) when l + r <= n, do: {q, Yaq.new()}
+
+  def split(%__MODULE__{l_size: l} = q, n) when l >= n do
+    {left, remainder} = Enum.split(q.l_data, n)
+    front = %__MODULE__{l_data: left, l_size: n, r_data: [], r_size: 0}
+
+    rear = %__MODULE__{
+      l_data: remainder,
+      l_size: q.l_size - n,
+      r_data: q.r_data,
+      r_size: q.r_size
+    }
+
+    {front, rear}
+  end
+
+  def split(%__MODULE__{} = q, n) do
+    # Bound the size
+    n = min(n, size(q))
+
+    {right, remainder} = Enum.split(q.r_data, n - size(q))
+
+    front = %__MODULE__{
+      l_data: q.l_data,
+      l_size: q.l_size,
+      r_data: remainder,
+      r_size: n - q.l_size
+    }
+
+    rear = %__MODULE__{l_data: [], l_size: 0, r_data: right, r_size: size(q) - n}
+
+    {front, rear}
+  end
+
+  @doc """
   Return the number of elements in the queue.
 
   ## Parameters

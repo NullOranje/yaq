@@ -153,6 +153,29 @@ defmodule YaqTest do
         assert Yaq.size(q) == length(input)
       end
     end
+
+    property "split/2 correctly splits the queue into two queues" do
+      check all(
+              input <- list_of(term()),
+              amount <- integer(),
+              amount >= 0
+            ) do
+        q = Yaq.new(input)
+        {l, r} = Yaq.split(q, amount)
+        assert Yaq.size(q) == Yaq.size(l) + Yaq.size(r)
+        assert Yaq.size(l) <= amount
+        assert Yaq.to_list(q) == Yaq.to_list(l) ++ Yaq.to_list(r)
+
+        # We enqueue and dequeue something to ensure the queue rebalances
+        # itself at least once internally
+        t = term()
+        {^t, q} = Yaq.enqueue(q, t) |> Yaq.dequeue_r()
+        {l, r} = Yaq.split(q, amount)
+        assert Yaq.size(q) == Yaq.size(l) + Yaq.size(r)
+        assert Yaq.size(l) <= amount
+        assert Yaq.to_list(q) == Yaq.to_list(l) ++ Yaq.to_list(r)
+      end
+    end
   end
 
   describe "Inspect protocol" do
