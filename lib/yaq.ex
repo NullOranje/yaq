@@ -342,7 +342,7 @@ defmodule Yaq do
   @doc """
   Fetches the rear value from the queue.
 
-  If the queue is empty, reutrns the `:error`.  Otherwise, returns the tuple `{{:ok, value}, q}`.
+  If the queue is empty, returns the `:error`.  Otherwise, returns the tuple `{{:ok, value}, q}`.
 
   ## Parameters
 
